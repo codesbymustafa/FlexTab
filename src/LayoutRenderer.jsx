@@ -1,11 +1,16 @@
 // import React from 'react';
+import useTreeStore from './stores/Treestore';
 
-export default function LayoutRenderer ({ tree }){
+export default function LayoutRenderer (){
   // Recursive function to render nodes
+  
+  const tree = useTreeStore((state) => state.tree);
+  
   const renderNode = (node) => {
     if (!node) return null;
 
     // Determine the style based on parent's split direction
+
     const style = {
       height: `${node.height}%`,
       width: `${node.width}%`,
