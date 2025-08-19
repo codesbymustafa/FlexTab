@@ -7,6 +7,7 @@ export default function SplitControls() {
 
   const treeData = useTreeStore((state) => state.tree);
   const splitNode = useTreeStore((state) => state.splitNode);
+  const componentMap = useComponentStore((state) => state.map);
   const [selectedLeaf, setSelectedLeaf] = React.useState("");
   const [splitType, setSplitType] = React.useState("horizontal");
   const [position, setPosition] = React.useState("top");
@@ -21,8 +22,25 @@ export default function SplitControls() {
 
     splitNode(selectedLeaf, splitType, position, newComponent);
 
-    useComponentStore.setState(produce((state) => {state.map.set(newComponent, selectedLeaf)}));
+    let newleafId = selectedLeaf + `.`;
+    let oldleafId = selectedLeaf + `.`;
+
+    if (position === "top" || position === "left") {
+      newleafId += "1";
+      oldleafId += "2";
+    } else {
+      newleafId += "2";
+      oldleafId += "1";
+    }
     
+
+    const oldComponent = componentMap.get(selectedLeaf);
+
+    useComponentStore.setState(produce((state) => {state.map.delete(selectedLeaf)}));
+    useComponentStore.setState(produce((state) => {state.map.set(newleafId, newComponent)}));
+    useComponentStore.setState(produce((state) => {state.map.set(oldleafId, oldComponent)}));
+    
+    console.log(useComponentStore.getState().map);
     // Reset form
     setSelectedLeaf("");
     setNewComponent("");
@@ -47,7 +65,7 @@ export default function SplitControls() {
                 <option value="">-- Select --</option>
                 {treeData.all_leaves.map(leafId => (
                   <option key={leafId} value={leafId}>
-                    {leafId}
+                    {componentMap.get(leafId)}
                   </option>
                 ))}
               </select>

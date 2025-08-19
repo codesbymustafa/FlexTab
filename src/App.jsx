@@ -22,6 +22,8 @@ const App = () => {
   useTreeStore.setState({ tree: treeData });
   useComponentStore.setState(produce((state) => {state.map.set("0", "01")}))
 
+  console.log(useComponentStore.getState().map); // Debugging log
+
   return (
   <>
   <SideBar/>

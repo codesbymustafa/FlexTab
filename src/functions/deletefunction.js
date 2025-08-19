@@ -8,6 +8,21 @@ export default function deleteLeaf (tree, leafId) {
   // Deep clone the tree to avoid mutations
   const newTree = JSON.parse(JSON.stringify(tree));
   
+  // Function to update dimensions when promoting a sibling
+  const updateDimensions = (node, parentWidth, parentHeight) => {
+    node.width = parentWidth;
+    node.height = parentHeight;
+    
+    // If the promoted node is a container, update its children's dimensions
+    if (node.type === 'container' && node.children) {
+      node.children.forEach(child => {
+        // For containers, children should maintain their relative proportions
+        // but within the new parent dimensions
+        updateDimensions(child, child.width, child.height);
+      });
+    }
+  };
+  
   // Recursive function to find and delete the target leaf
   const findAndDelete = (node, parentNode = null, childIndex = -1, grandparentNode = null, parentIndex = -1) => {
     if (!node) return false;
@@ -29,13 +44,20 @@ export default function deleteLeaf (tree, leafId) {
         return false;
       }
       
+      // Store parent's dimensions before replacement
+      const parentWidth = parentNode.width;
+      const parentHeight = parentNode.height;
+      
       // If there's no grandparent, the parent is the root
       if (!grandparentNode) {
-        // Replace root with the sibling
+        // Replace root with the sibling and give it full dimensions
         Object.assign(newTree.root, sibling);
+        updateDimensions(newTree.root, 100, 100); // Root should always be 100% x 100%
       } else {
         // Replace parent node with sibling in grandparent's children
         grandparentNode.children[parentIndex] = sibling;
+        // Update sibling dimensions to match the parent it's replacing
+        updateDimensions(sibling, parentWidth, parentHeight);
       }
       
       // Update all_leaves array
@@ -43,10 +65,6 @@ export default function deleteLeaf (tree, leafId) {
       if (leafIndex !== -1) {
         newTree.all_leaves.splice(leafIndex, 1);
       }
-      
-      // If the sibling was a container, we need to update all its descendant IDs
-      // to reflect the new position in the tree
-      // This is optional but keeps IDs consistent
       
       console.log(`Deleted leaf ${leafId}, promoted sibling ${sibling.id}`);
       return true;

@@ -7,6 +7,8 @@ export default function DeleteControls() {
 
   const treeData = useTreeStore((state) => state.tree);
   const deleteNode = useTreeStore((state) => state.deleteNode);
+  const componentMap = useComponentStore((state) => state.map);
+
   const [selectedLeaf, setSelectedLeaf] = React.useState("");
   enableMapSet();
   // Handle delete operation
@@ -17,7 +19,10 @@ export default function DeleteControls() {
     }
 
     deleteNode(selectedLeaf);
+
     useComponentStore.setState(produce((state) => {state.map.delete(selectedLeaf)}));
+
+    console.log(useComponentStore.getState().map); // Debugging log
     
     // Reset form
     setSelectedLeaf("");
@@ -40,7 +45,7 @@ export default function DeleteControls() {
                 <option value="">-- Select --</option>
                 {treeData.all_leaves.map(leafId => (
                   <option key={leafId} value={leafId}>
-                    {leafId}
+                    {componentMap.get(leafId)}
                   </option>
                 ))}
               </select>
