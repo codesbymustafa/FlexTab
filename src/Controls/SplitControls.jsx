@@ -1,13 +1,11 @@
 import React from 'react'
 import useTreeStore from '../stores/Treestore';
-import useComponentStore from '../stores/ComponentStore';
-import {enableMapSet ,produce} from 'immer';
+import {enableMapSet } from 'immer';
 enableMapSet();
 export default function SplitControls() {
 
   const treeData = useTreeStore((state) => state.tree);
   const splitNode = useTreeStore((state) => state.splitNode);
-  const componentMap = useComponentStore((state) => state.map);
   const [selectedLeaf, setSelectedLeaf] = React.useState("");
   const [splitType, setSplitType] = React.useState("horizontal");
   const [position, setPosition] = React.useState("top");
@@ -20,33 +18,11 @@ export default function SplitControls() {
       return;
     }
 
-    splitNode(selectedLeaf, splitType, position, newComponent);
-
-    let newleafId = selectedLeaf + `.`;
-    let oldleafId = selectedLeaf + `.`;
-
-    if (position === "top" || position === "left") {
-      newleafId += "1";
-      oldleafId += "2";
-    } else {
-      newleafId += "2";
-      oldleafId += "1";
-    }
-    
-
-    const oldComponent = componentMap.get(selectedLeaf);
-
-    useComponentStore.setState(produce((state) => {state.map.delete(selectedLeaf)}));
-    useComponentStore.setState(produce((state) => {state.map.set(newleafId, newComponent)}));
-    useComponentStore.setState(produce((state) => {state.map.set(oldleafId, oldComponent)}));
-    
-    console.log(useComponentStore.getState().map);
+    splitNode(selectedLeaf, splitType, position, newComponent);  
     // Reset form
     setSelectedLeaf("");
     setNewComponent("");
   };
-
-  console.log("SplitControls rendered with treeData:"); // Debugging log
 
 
   return (
@@ -64,8 +40,8 @@ export default function SplitControls() {
               >
                 <option value="">-- Select --</option>
                 {treeData.all_leaves.map(leafId => (
-                  <option key={leafId} value={leafId}>
-                    {componentMap.get(leafId)}
+                  <option key={leafId.id} value={leafId.id}>
+                    {leafId.component}
                   </option>
                 ))}
               </select>

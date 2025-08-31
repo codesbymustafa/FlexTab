@@ -20,16 +20,14 @@ export default function splitLeaf (tree, leafId, splitType, position, newCompone
       const child1 = {
         id: `${node.id}.1`,
         type: 'leaf',
-        height: splitType === 'horizontal' ? 50 : 100,
-        width: splitType === 'vertical' ? 50 : 100,
+        ratio: 50,
         component_connected: null
       };
       
       const child2 = {
         id: `${node.id}.2`,
         type: 'leaf',
-        height: splitType === 'horizontal' ? 50 : 100,
-        width: splitType === 'vertical' ? 50 : 100,
+        ratio: 50,
         component_connected: null
       };
       
@@ -46,9 +44,13 @@ export default function splitLeaf (tree, leafId, splitType, position, newCompone
       node.children = [child1, child2];
       
       // Update all_leaves array - remove old leaf, add new leaves
-      const leafIndex = newTree.all_leaves.indexOf(leafId);
-      
-      newTree.all_leaves.splice(leafIndex, 1, child1.id, child2.id);
+
+      const leafIndex = newTree.all_leaves.findIndex(leaf => leaf.id === leafId);
+
+      const newId1 = {id : child1.id , component : child1.component_connected}
+      const newId2 = {id : child2.id , component : child2.component_connected}
+
+      newTree.all_leaves.splice(leafIndex, 1, newId1 , newId2);
       
       return true;
     }
@@ -65,8 +67,7 @@ export default function splitLeaf (tree, leafId, splitType, position, newCompone
     return false;
   };
   
-  const success = 
-  findAndSplit(newTree.root);
+  const success = findAndSplit(newTree.root);
   
   if (!success) {
     console.error(`Failed to split leaf with ID: ${leafId}. Make sure it exists and is a leaf node.`);

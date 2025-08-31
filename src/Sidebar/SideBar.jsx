@@ -20,7 +20,11 @@ const resize = useCallback(
     (mouseMoveEvent) => {
       if (isResizing) {
         const newWidth = window.innerWidth - mouseMoveEvent.clientX;
-        if (newWidth >= 200 && newWidth <= 600) {
+        if(newWidth < 250) {
+          setIsVisible(false);
+          return
+        }
+        if (newWidth <= 600) {
           setWidth(newWidth);
         }
       }

@@ -9,18 +9,8 @@ export default function deleteLeaf (tree, leafId) {
   const newTree = JSON.parse(JSON.stringify(tree));
   
   // Function to update dimensions when promoting a sibling
-  const updateDimensions = (node, parentWidth, parentHeight) => {
-    node.width = parentWidth;
-    node.height = parentHeight;
-    
-    // If the promoted node is a container, update its children's dimensions
-    if (node.type === 'container' && node.children) {
-      node.children.forEach(child => {
-        // For containers, children should maintain their relative proportions
-        // but within the new parent dimensions
-        updateDimensions(child, child.width, child.height);
-      });
-    }
+  const updateRatio = (node, parentRatio) => {
+    node.ratio = parentRatio;    
   };
   
   // Recursive function to find and delete the target leaf
@@ -29,44 +19,39 @@ export default function deleteLeaf (tree, leafId) {
     
     // Found the target leaf
     if (node.id === leafId && node.type === 'leaf') {
-      // Can't delete if there's no parent (shouldn't happen except for root)
-      if (!parentNode) {
-        console.error("Cannot delete a node without a parent");
-        return false;
-      }
-      
+
       // Find the sibling
       const siblingIndex = childIndex === 0 ? 1 : 0;
       const sibling = parentNode.children[siblingIndex];
       
-      if (!sibling) {
-        console.error("No sibling found - this shouldn't happen in a binary tree");
-        return false;
-      }
-      
-      // Store parent's dimensions before replacement
-      const parentWidth = parentNode.width;
-      const parentHeight = parentNode.height;
+      // Store parent's ratio before replacement
+      const parentRatio = parentNode.ratio;
       
       // If there's no grandparent, the parent is the root
       if (!grandparentNode) {
-        // Replace root with the sibling and give it full dimensions
+        // Replace root with the sibling and give it 100% ratio
         Object.assign(newTree.root, sibling);
-        updateDimensions(newTree.root, 100, 100); // Root should always be 100% x 100%
+        updateRatio(newTree.root, 100);
+        
       } else {
         // Replace parent node with sibling in grandparent's children
         grandparentNode.children[parentIndex] = sibling;
-        // Update sibling dimensions to match the parent it's replacing
-        updateDimensions(sibling, parentWidth, parentHeight);
+        // Update sibling ratio to match the parent it's replacing
+        updateRatio(sibling, parentRatio);
       }
       
       // Update all_leaves array
-      const leafIndex = newTree.all_leaves.indexOf(leafId);
+      const leafIndex = newTree.all_leaves.findIndex(leaf => leaf.id === leafId);
+
       if (leafIndex !== -1) {
         newTree.all_leaves.splice(leafIndex, 1);
       }
-      
-      console.log(`Deleted leaf ${leafId}, promoted sibling ${sibling.id}`);
+
+      if(newTree.root.type === 'leaf'){
+        delete newTree.root.children
+        delete newTree.root.split
+      }
+
       return true;
     }
     

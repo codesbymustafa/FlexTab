@@ -1,13 +1,11 @@
 import React from 'react'
 import useTreeStore from '../stores/Treestore';
-import useComponentStore from '../stores/ComponentStore';
-import {enableMapSet ,produce} from 'immer';
+import {enableMapSet } from 'immer';
 
 export default function DeleteControls() {
 
   const treeData = useTreeStore((state) => state.tree);
   const deleteNode = useTreeStore((state) => state.deleteNode);
-  const componentMap = useComponentStore((state) => state.map);
 
   const [selectedLeaf, setSelectedLeaf] = React.useState("");
   enableMapSet();
@@ -20,10 +18,6 @@ export default function DeleteControls() {
 
     deleteNode(selectedLeaf);
 
-    useComponentStore.setState(produce((state) => {state.map.delete(selectedLeaf)}));
-
-    console.log(useComponentStore.getState().map); // Debugging log
-    
     // Reset form
     setSelectedLeaf("");
   };
@@ -44,8 +38,8 @@ export default function DeleteControls() {
               >
                 <option value="">-- Select --</option>
                 {treeData.all_leaves.map(leafId => (
-                  <option key={leafId} value={leafId}>
-                    {componentMap.get(leafId)}
+                  <option key={leafId.id} value={leafId.id}>
+                    {leafId.component}
                   </option>
                 ))}
               </select>
