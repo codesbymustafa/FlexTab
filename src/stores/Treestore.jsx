@@ -7,7 +7,21 @@ import resize from "../functions/resizefunction";
 const useTreeStore = create(
   persist(
     (set) => ({
-      tree: {},
+      tree: 
+          {
+  "all_leaves" : [
+    {
+      "id": "0",
+      "component": "Notes"
+    }
+  ],
+  "root": {
+    "id": "0",
+    "ratio": 100,
+    "type": "leaf",
+    "component_connected": "Google Search"
+  }
+},
 
       splitNode: (leafId, splitType, position, newComponent) =>
         set((state) => ({

@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import useTreeStore from './stores/Treestore';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import useTreeStore from '../stores/Treestore';
+import LeafNode from './components/LeafNode';
 
 export default function LayoutRenderer() {
   const tree = useTreeStore((state) => state.tree);
@@ -56,18 +57,16 @@ export default function LayoutRenderer() {
     let newRatio2 = 100 - newRatio1;
     
     // Enforce bounds
-    if (newRatio1 < 10) {
-      newRatio1 = 10;
-      newRatio2 = 90;
-    } else if (newRatio1 > 90) {
-      newRatio1 = 90;
-      newRatio2 = 10;
+    if (newRatio1 < 20) {
+      newRatio1 = 20;
+      newRatio2 = 80;
+    } else if (newRatio1 > 80) {
+      newRatio1 = 80;
+      newRatio2 = 20;
     }
     
-    // Update local ratio for immediate feedback
     setLocalRatio(newRatio1);
     
-    // Throttle actual store updates for better performance
     requestAnimationFrame(() => {
       resizeNode(resizing.parentId, newRatio1, newRatio2);
     });
@@ -101,7 +100,7 @@ export default function LayoutRenderer() {
       width: '100%',
       height: '100%',
       position: 'relative',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
     } : {
       flexBasis: `${node.ratio}%`,
       flexGrow: 0,
@@ -111,28 +110,13 @@ export default function LayoutRenderer() {
       minWidth: 0,
       minHeight: 0
     };
-    
-    const padding = "8px";
 
     if (node.type === 'leaf') {
       return (
-        <div
-          key={node.id}
-          className="bg-gray-900 flex items-center justify-center text-white font-mono text-sm overflow-hidden" 
-          style={{...style, padding: padding}}
-        >
-          <div className='flex justify-center p-0 border border-gray-700 rounded-2xl h-full w-full overflow-hidden '>
-
-            <div className='bg-gray-800 w-full text-center h-7 flex items-center justify-center border-b border-gray-700'>
-              
-              <span className="text-blue-400 font-semibold">
-                {node.component_connected || node.id}
-              </span>
-
-            </div>
-
-          </div>
-        </div>
+        <LeafNode
+          node = {node}
+          style = {style}
+        />
       );
     }
 
@@ -147,8 +131,11 @@ export default function LayoutRenderer() {
       return (
         <div
           key={node.id}
+          
           ref={el => containerRefs.current[node.id] = el}
-          className={`flex ${isVerticalSplit ? 'flex-row' : 'flex-col'} relative`}
+
+          className={`flex ${isVerticalSplit ? 'flex-row' : 'flex-col'} relative } `}
+
           style={style}
         >
           {/* First child */}
@@ -214,7 +201,7 @@ export default function LayoutRenderer() {
   }, [handleMouseDown, resizing, localRatio]);
 
   return (
-    <div className="w-full h-screen bg-gray-950 p-4">
+    <div className="w-full h-screen p-0">
       <div className="w-full h-full relative">
         {tree && tree.root && renderNode(tree.root)}
       </div>

@@ -1,10 +1,10 @@
-// import { create } from "zustand";
+import { create } from "zustand";
 
-// const componentMap = new Map();
+const componentMap = new Map();
 
-// const useComponentStore = create(() => ({
-//   map: componentMap
-// }))
+const useComponentStore = create(() => ({
+  map: componentMap
+}))
 
 
-// export default useComponentStore;
+export default useComponentStore;
