@@ -12,7 +12,7 @@ const useTreeStore = create(
   "all_leaves" : [
     {
       "id": "0",
-      "component": "Notes"
+      "component": "Google Search"
     }
   ],
   "root": {
